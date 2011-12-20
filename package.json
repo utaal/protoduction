@@ -1,0 +1,11 @@
+{
+  "name": "jade-static",
+  "version": "0.1.0",
+  "dependencies":
+  { "connect": "*",
+    "jade": "*",
+    "optimist": "*",
+    "underscore": "*",
+    "less": "*"
+  }
+}
