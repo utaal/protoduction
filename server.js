@@ -42,19 +42,23 @@ function less_do(stylesheet, cb) {
       filename: filename
     });
 
-    fs.readFile(filename, 'ascii', function(err, data) {
+    fs.readFile(filename, 'utf8', function(err, data) {
       if (err) {
         cb(err);
         return;
       }
-      console.log('>' + typeof(data));
       parser.parse(data, function(err, tree) {
         if (err) {
           cb(err);
           return;
         }
-        console.log('>' + tree);
-        rendered = tree.toCSS({ compress: !argv.nocompress }); 
+        try {
+          rendered = tree.toCSS({ compress: !argv.nocompress }); 
+        } catch (e) {
+          err = {}
+          err.message = '": error rendering less: ' + e.message;
+          cb(err);
+        }
         info('"' + filename + '": less rendered, caching (if not disabled)');
         css_cache[stylesheet] = rendered;
         cb(null, rendered);
@@ -69,15 +73,15 @@ function jade_do(template, locals, cb) {
   if (argv.nohtmlcache || ! fn) {
     var filename = template + '.jade';
     info('"' + filename + '": compiling jade');
-    fs.readFile(filename, 'ascii', function(err, data) {
+    fs.readFile(filename, 'utf8', function(err, data) {
       if (err) {
         cb(err, null);
         return;
       }
-      fn = jade.compile(data, { filename: filename });
-      info('"' + filename + '": jade complied, caching (if not disabled)');
-      jade_compiled[template] = fn;
       try {
+        fn = jade.compile(data, { filename: filename });
+        info('"' + filename + '": jade complied, caching (if not disabled)');
+        jade_compiled[template] = fn;
         var rendered = fn(locals);
         cb(null, rendered);
       } catch (e) {
@@ -129,6 +133,7 @@ var routes = function(app) {
 
 var server = connect.createServer(
     connect.logger('tiny')
+  , connect.staticCache()
   , connect.static(__dirname + '/static')
   , connect.router(routes)
     );
