@@ -10,6 +10,7 @@ optimist = require('optimist')
   .default('debug', false)
   .default('config-path', 'config')
   .boolean('help')
+  .default('minify-css', true) # TODO: use NODE_ENV instead
   .default('static-path', 'static')
   .default('stylesheet-path', 'style')
 
@@ -28,7 +29,7 @@ server = connect.createServer(
   connect.logger('tiny'),
   connect.staticCache(),
   connect.static(argv['static-path']),
-  lessCompiler(argv['stylesheet-path']),
+  lessCompiler(argv['stylesheet-path'], {compress: argv['minify-css']}),
   configRouter(argv['config-path'])
 )
 

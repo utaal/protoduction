@@ -24,8 +24,10 @@ normalizePath = (path, keys) ->
   path = path.replace(/\*/g, "(.+)")
   new RegExp("^" + path + "$", "i")
 
-httpError = (code) ->
-  err = new Error(http.STATUS_CODES[code])
+# TODO: refactor to own module, same in lessCompiler
+httpError = (code, msg) ->
+  log.ERROR msg
+  err = new Error("" + msg)
   err.status = code
   err
 
@@ -74,16 +76,14 @@ module.exports = (config_path, cb) ->
   getData = (data_file, jpath, cb) ->
     fs.readFile data_file, 'utf8', (err, data) ->
       if err
-        log.ERROR err
-        cb httpError(404)
+        cb httpError(404, err.message)
         return
       try
         data = JSON.parse(data)
         data = jsonpath(data, jpath)
         cb null, data
       catch except
-        log.ERROR err
-        cb httpError(500)
+        cb httpError(500, except.message)
 
   match = (path) ->
     found = undefined
@@ -127,8 +127,7 @@ module.exports = (config_path, cb) ->
     obj.params = matched.params
     renderer.render matched.template, obj, (err, html) ->
       if err
-        log.ERROR err
-        next httpError(500)
+        next httpError 500, err.message
         return
       res.writeHead 200, 'Content-Type': 'text/html'
       res.end html
@@ -149,8 +148,7 @@ module.exports = (config_path, cb) ->
     else
       getData matched.data_file, matched.jpath, (err, obj) ->
         if err
-          log.ERROR err
-          next httpError(500)
+          next httpError 500, err.message
           return
         switch matched.cond
           when ROUTE_COND_ONE

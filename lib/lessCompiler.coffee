@@ -3,6 +3,13 @@ less = require('less')
 log = require('./log').logger('lessCompiler')
 url = require('url')
 
+# TODO: refactor to own module, same in configRouter
+httpError = (code, msg) ->
+  log.ERROR msg
+  err = new Error("" + msg)
+  err.status = code
+  err
+
 module.exports = (search_path, opts) ->
   opts = opts || {}
   compress = opts.compress || false
@@ -29,18 +36,12 @@ module.exports = (search_path, opts) ->
       lessParser = new less.Parser paths: [search_path], filename: filename
       lessParser.parse data, (err, tree) ->
         if err
-          log.ERROR "#{filename}: cannot parse less: #{err}"
-          err = new Error(http.STATUS_CODES[500])
-          err.status = 500
-          next err
+          next httpError 500, "#{filename}: cannot parse less: #{err.message}"
           return
         try
           rendered = tree.toCSS compress: compress
         catch except
-          log.ERROR "#{filename}: cannot render less: #{except.message}"
-          err = new Error(http.STATUS_CODES[500])
-          err.status = 500
-          next err
+          next httpError 500, "#{filename}: cannot render less: #{except.message}"
           return
         res.writeHead 200, 'Content-Type': 'text/css'
         res.end rendered
