@@ -20,7 +20,12 @@ describe 'configrouter', () ->
       .get('/')
       .expect(200, done)
 
-  it 'should process parametrized routes', (done) ->
+  it 'should process requests to routes not referencing any data file', (done) ->
+    request(app)
+      .get('/dataless/12')
+      .expect(200, done)
+
+  it 'should process correctly parametrized routes', (done) ->
     request(app)
       .get('/testurl')
       .expect(200, done)

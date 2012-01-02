@@ -109,7 +109,8 @@ module.exports = (config_path, cb) ->
 
         jpath = route.jpath
         log.DEBUG 'keys: ' + keys
-        jpath = jpath.replace '#' + key, params[key] for key in keys
+        if jpath?
+          jpath = jpath.replace '#' + key, params[key] for key in keys
         
         found =
           template: route.template
@@ -147,7 +148,8 @@ module.exports = (config_path, cb) ->
     else
       getData matched.data_file, matched.jpath, (err, obj) ->
         if err
-          next err
+          log.ERROR err
+          next httpError(500) 
           return
         switch matched.cond
           when ROUTE_COND_ONE
