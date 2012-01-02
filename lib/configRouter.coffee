@@ -130,6 +130,7 @@ module.exports = (config_path, cb) ->
         log.ERROR err
         next httpError(500)
         return
+      res.writeHead 200, 'Content-Type': 'text/html'
       res.end html
 
   processRequest = (req, res, next) ->
@@ -149,7 +150,7 @@ module.exports = (config_path, cb) ->
       getData matched.data_file, matched.jpath, (err, obj) ->
         if err
           log.ERROR err
-          next httpError(500) 
+          next httpError(500)
           return
         switch matched.cond
           when ROUTE_COND_ONE

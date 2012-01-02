@@ -1,17 +1,27 @@
 {
-  "name": "jade-static",
-  "version": "0.1.0",
-  "dependencies":
-  { "connect": "*",
-    "jade": "*",
-    "optimist": "*",
-    "underscore": "*",
-    "less": "*",
-    "mocha": "*",
-    "JSONPath": "*"
-  },
-  "devDependencies":
-  { "mocha": "*",
-    "should": "*"
-  }
+  "name": "protoduction"
+, "version": "0.0.1"
+, "description": "lightweight server for template-based static websites"
+, "keywords": [ "server", "static", "cms" ]
+, "author": "Andrea Lattuada <andrea@backyardscale.com>"
+, "homepage": "http://github.com/utaal/protoduction"
+, "bugs": "http://github.com/utaal/protoduction/issues"
+, "main": "index"
+, "bin": { "protoduction": "./bin/protoduction" }
+, "dependencies":
+    { "coffee-script": "~1.2.0"
+    , "connect": "~1.8.5"
+    , "jade": "~0.20.0"
+    , "JSONPath": "~0.8.5"
+    , "less": "~1.1.6"
+    , "optimist": "~0.3.1"
+    , "underscore": "~1.2.3"
+    }
+, "devDependencies":
+    { "mocha": "~0.8.1"
+    , "should": "~0.4.2"
+    }
+, "engines":
+    { "node": "~0.6.6" }
+, "preferGlobal": true
 }
