@@ -6,6 +6,12 @@
     "jade": "*",
     "optimist": "*",
     "underscore": "*",
-    "less": "*"
+    "less": "*",
+    "mocha": "*",
+    "JSONPath": "*"
+  },
+  "devDependencies":
+  { "mocha": "*",
+    "should": "*"
   }
 }
