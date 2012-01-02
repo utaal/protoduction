@@ -3,6 +3,7 @@ http = require('http')
 jsonpath = require('JSONPath').eval
 log = require('./log').logger('configRouter')
 renderer = require('./renderer')
+url = require('url')
 util = require('util')
 _ = require('underscore')
 
@@ -28,13 +29,16 @@ httpError = (code) ->
   err.status = code
   err
 
-module.exports = (spec, cb) ->
-  spec = spec || {}
+module.exports = (config_path, cb) ->
   
-  config_path = spec.config_path || 'config'
-  util.inspect(config_path)
+  if not config_path?
+    throw new Error('Missing configuration file path (config_path)')
 
   routes = []
+
+  ROUTE_COND_ONE = 1
+  ROUTE_COND_MULTI = 2
+  ROUTE_COND_ALL = 3
 
   updateRoutes = (cb) ->
     log.DEBUG "config_path: #{config_path}"
@@ -43,18 +47,26 @@ module.exports = (spec, cb) ->
       new_routes = []
       lines = data.split("\n")
       _.each lines, (line) ->
-        split = _.reject line.split(' '), (val) -> val == ""
-        if split.length != 4
+        split = _.reject line.split(/\s/), (val) -> val == ""
+        if split.length < 2
           return
-        [path, template, data, jpath] = split
+        [path, template, data, jpath, cond] = split
         keys = []
         path = normalizePath path, keys
-        new_routes.push
+        route =
           path: path
           keys: keys
           template: template
-          data_file: data
-          jpath: jpath
+        if data? and jpath?
+          switch cond
+            when "one" then cond = ROUTE_COND_ONE
+            when "multi" then cond = ROUTE_COND_MULTI
+            when "all" then cond = ROUTE_COND_ALL
+            else cond = null
+          route.data_file = data
+          route.jpath = jpath
+          route.cond = cond
+        new_routes.push route
       log.DEBUG "loaded new routes"
       routes = new_routes
       cb() if cb?
@@ -78,9 +90,9 @@ module.exports = (spec, cb) ->
     i = 0
     while i < routes.length and not found?
       route = routes[i]
-      log.DEBUG route
+      log.DEBUG "route: " + util.inspect route
       if captures = route.path.exec(path)
-        log.DEBUG captures
+        log.DEBUG "captures: " + util.inspect captures
         params = []
         keys = route.keys
         j = 1
@@ -105,36 +117,58 @@ module.exports = (spec, cb) ->
           jpath: jpath
           keys: keys
           params: params
+          cond: route.cond
         log.DEBUG util.inspect(found)
       ++i
     return found
+
+  send = (matched, obj, req, res, next) ->
+    obj.params = matched.params
+    renderer.render matched.template, obj, (err, html) ->
+      if err
+        log.ERROR err
+        next httpError(500)
+        return
+      res.end html
 
   processRequest = (req, res, next) ->
     get = req.method == 'GET'
     if not get
       next()
       return
-    path = req.url
-    matched = match path
+    parsedUrl = url.parse req.url
+    matched = match parsedUrl.pathname
     if not matched?
-      log.DEBUG "url #{path} not matched"
+      log.DEBUG "url #{parsedUrl.pathname} not matched"
       next()
       return
-    getData matched.data_file, matched.jpath, (err, obj) ->
-      if err
-        next err
-        return
-      renderer.render matched.template, obj[0], (err, html) ->
+    if not matched.data_file?
+      send matched, {}, req, res, next
+    else
+      getData matched.data_file, matched.jpath, (err, obj) ->
         if err
-          log.ERROR err
-          next httpError(500)
+          next err
           return
-        res.end html
+        switch matched.cond
+          when ROUTE_COND_ONE
+            if obj.length != 1
+              log.DEBUG "route condition 'one' not satisfied"
+              next()
+              return
+            obj = obj[0]
+          when ROUTE_COND_MULTI
+            if obj.length < 1
+              log.DEBUG "route condition 'multi' not satisfied"
+              next()
+          when ROUTE_COND_ALL
+          else
+            obj = obj[0]
+        send matched, obj, req, res, next
 
   updateRoutes(cb)
 
   fs.watchFile config_path, (curr, prev) ->
-    if curr.mtime is not prev.mtime
+    if curr.mtime.getTime() != prev.mtime.getTime()
       updateRoutes()
 
   return processRequest

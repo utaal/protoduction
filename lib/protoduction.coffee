@@ -19,7 +19,7 @@ server = connect.createServer(
   connect.logger('tiny'),
   connect.staticCache(),
   connect.static(__dirname + '/static'),
-  configRouter config_path: argv.config_path
+  configRouter(argv.config_path)
 )
 
 server.listen(argv.port)

@@ -1,2 +1,3 @@
 /                  test/fixtures/template.jade          test/fixtures/data.json          $.homepage
-/:page             test/fixtures/template.jade          test/fixtures/data.json          $.#page
+/withparams/:num   test/fixtures/withparams.jade        test/fixtures/data.json          $.withparams
+/:page             test/fixtures/template.jade          test/fixtures/data.json          $.#page             one
