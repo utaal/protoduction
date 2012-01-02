@@ -1,5 +1,8 @@
 {
   "homepage": {
     "text": "test"
+  },
+  "testurl": {
+    "text": "parametrized"
   }
 }

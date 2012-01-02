@@ -1,1 +1,2 @@
 /                  test/fixtures/template.jade          test/fixtures/data.json          $.homepage
+/:page             test/fixtures/template.jade          test/fixtures/data.json          $.#page
