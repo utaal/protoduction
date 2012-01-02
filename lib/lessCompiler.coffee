@@ -10,7 +10,7 @@ module.exports = (search_path, opts) ->
   ret = (req, res, next) ->
     parsedUrl = url.parse(req.url)
     path = parsedUrl.pathname
-    if not path.substring(-4) == '.css'
+    if path.substring(path.length - 4) != '.css'
       log.DEBUG "skipping #{path}, it doesn't end with .css"
       next()
       return

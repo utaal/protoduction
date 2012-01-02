@@ -22,11 +22,12 @@ if argv.debug
   logmodule.enableDebug()
 
 log = logmodule.logger('protoduction')
+log.DEBUG __dirname
 
 server = connect.createServer(
   connect.logger('tiny'),
   connect.staticCache(),
-  connect.static(__dirname + '/' + argv['static-path']),
+  connect.static(argv['static-path']),
   lessCompiler(argv['stylesheet-path']),
   configRouter(argv['config-path'])
 )
