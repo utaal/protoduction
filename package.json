@@ -8,6 +8,7 @@
 , "bugs": "http://github.com/utaal/protoduction/issues"
 , "main": "index"
 , "bin": { "protoduction": "./bin/protoduction" }
+, "scripts": { "test": "./node_modules/.bin/mocha --reporter list test/lib/*.coffee" }
 , "dependencies":
     { "coffee-script": "~1.2.0"
     , "connect": "~1.8.5"
