@@ -11,7 +11,7 @@ optimist = require('optimist')
   .default('config-path', 'config')
   .boolean('help')
   .default('minify-css', true) # TODO: use NODE_ENV instead
-  .default('static-path', 'static')
+  .default('public-path', 'public')
   .default('stylesheet-path', 'style')
 
 argv = optimist.argv
@@ -25,13 +25,14 @@ if argv.debug
 log = logmodule.logger('protoduction')
 log.DEBUG __dirname
 
-server = connect.createServer(
-  connect.logger('tiny'),
-  connect.staticCache(),
-  connect.static(argv['static-path']),
-  lessCompiler(argv['stylesheet-path'], {compress: argv['minify-css']}),
-  configRouter(argv['config-path'])
-)
+server = connect.createServer()
+server.use connect.logger('tiny')
+server.use connect.staticCache()
+server.use connect.static(argv['public-path'])
+server.use '/' + argv['stylesheet-path'], lessCompiler(
+  argv['stylesheet-path'],
+  {compress: argv['minify-css']})
+server.use configRouter(argv['config-path'])
 
 server.listen(argv.port)
 log.INFO "serving on port #{argv.port}"
