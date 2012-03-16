@@ -10,17 +10,18 @@
 , "bin": { "protoduction": "./bin/protoduction" }
 , "scripts": { "test": "./node_modules/.bin/mocha --reporter list test/lib/*.coffee" }
 , "dependencies":
-    { "coffee-script": "~1.2.0"
-    , "connect": "~1.8.5"
-    , "jade": "~0.20.0"
-    , "JSONPath": "~0.8.5"
-    , "less": "~1.1.6"
-    , "optimist": "~0.3.1"
-    , "underscore": "~1.2.3"
+    { "coffee-script": "*"
+    , "connect": "*"
+    , "jade": "*"
+    , "JSONPath": "*"
+    , "less": "*"
+    , "optimist": "*"
+    , "underscore": "*"
     }
 , "devDependencies":
-    { "mocha": "~0.8.1"
-    , "should": "~0.4.2"
+    { "mocha": "*"
+    , "should": "*"
+    , "coffeedoc": "*"
     }
 , "engines":
     { "node": "~0.6.6" }
