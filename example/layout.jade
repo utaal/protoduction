@@ -1,0 +1,15 @@
+!!!
+html
+  head
+    title=title
+    link(rel="stylesheet", href="/bootstrap.css")
+    link(rel="stylesheet", href="/style/main.css")
+  body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          a.brand(href="/") Protoduction
+    .container
+      block content
+    include include/forkongithub.html
+

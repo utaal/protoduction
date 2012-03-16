@@ -1,0 +1,3 @@
+/                 index.jade               data.json           $.homepage
+/page/:pageid     pages/#pageid.jade       data.json           $.pages['#pageid']         one         context:main.json
+
