@@ -1,3 +1,7 @@
+###
+# Protoduction entry point
+###
+
 connect = require('connect')
 configRouter = require('./configRouter')
 lessCompiler = require('./lessCompiler')

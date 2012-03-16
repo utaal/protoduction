@@ -1,14 +1,14 @@
+###
+# protoduction lessCompiler module
+
+Compiles and serves less files.
+###
+
 fs = require('fs')
 less = require('less')
 log = require('./log').logger('lessCompiler')
+{ httpError } = require('./httpUtil')(log)
 url = require('url')
-
-# TODO: refactor to own module, same in configRouter
-httpError = (code, msg) ->
-  log.ERROR msg
-  err = new Error("" + msg)
-  err.status = code
-  err
 
 module.exports = (search_path, opts) ->
   opts = opts || {}
