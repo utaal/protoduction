@@ -43,7 +43,7 @@ later in this readme
   - `many`: same as `any`, but proceed rendering only if at least one object is returned
   - if no option is specified: proceed rendering anyway, pass only the first match (or `null` if not present) as view data
 
-The JSONPath expressions and backing data file paths may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before reading the data file and evaluating the JSONPath expression against it.
+The JSONPath expressions, template and backing data file paths may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before reading the data file and evaluating the JSONPath expression against it.
 
 Jade templates get passed the matched object from backing data with two fileds added:
   - `context` contain the entire contents of the data file
@@ -102,7 +102,6 @@ Testing is done through the excellent and extra-fun [mocha](http://visionmedia.g
 
 ### TODO
 
-- comments / doc
 - browser cache-control / if-modified-since / 304
 
 #### Author: [Andrea Lattuada](http://backyardscale.com)

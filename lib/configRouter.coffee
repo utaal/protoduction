@@ -1,5 +1,5 @@
 ###
-# protoduction configRouter module #
+# protoduction configRouter module
 
 
 This module parses the route config file and acts as a connect middleware to serve requests.
@@ -21,6 +21,7 @@ normalizePath = (path, keys) ->
   Normalizes and converts a sinatra-like route and transforms it to an equivalent regular expression.
   The 'keys' parameter should be an empty array and will be filled with the names of path parameters (:param) encountered.
   ###
+
   path = path.concat("/?")
   path = path.replace(/\/\(/g, "(?:/")
   path = path.replace /(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, (_, slash, format, key, capture, optional) ->
@@ -170,9 +171,10 @@ module.exports = (config_path, cb) ->
 
     jpath = mapPathParams route.jpath, params
     data_file = mapPathParams route.data_file, params
+    template = mapPathParams route.template, params
     
     found =
-      template: route.template
+      template: template
       data_file: data_file
       jpath: jpath
       keys: keys
