@@ -30,6 +30,11 @@ describe 'configrouter', () ->
       .get('/testurl')
       .expect(200, done)
 
+  it 'should process parametrized routes referencing parametrized data file path', (done) ->
+    request(app)
+      .get('/pathparam/pathparamfile')
+      .expect(200, done)
+
   it 'should ignore parametrized routes with condition "one" and empty data', (done) ->
     request(app)
       .get('/favicon.ico')

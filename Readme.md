@@ -36,12 +36,14 @@ where the parameters represent, respectively (in parentheses the corresponding a
 later in this readme
 - (`index.jade`) is the template to be rendered in response
 - (`data.json`) is the (optional) backing data file path
-- (`$.index`) is a JSONPath query on the root json object of the json backing data file; it's only required and allowed if the backing data file path is present: the matched object(s) will be passed as view data (argument) to the jade template; the JSONPath expression may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before evaluating the JSONPath expression against the data file
+- (`$.index`) is a JSONPath query on the root json object of the json backing data file; it's only required and allowed if the backing data file path is present: the matched object(s) will be passed as view data (argument) to the jade template
 - an optional last argument (only allowed when data path specified) may be one of:
   - `one`: proceed rendering only if one and only one match is returned from the JSONPath query, pass that object as the view data
   - `any`: proceed rendering anyway, pass an array containing the matches (possibly none or multiple)
   - `many`: same as `any`, but proceed rendering only if at least one object is returned
   - if no option is specified: proceed rendering anyway, pass only the first match (or `null` if not present) as view data
+
+The JSONPath expressions and backing data file paths may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before reading the data file and evaluating the JSONPath expression against it.
 
 Routes are [sinatra](http://www.sinatrarb.com/intro#Routes) -like, or similarly, [connect.router](http://senchalabs.github.com/connect/middleware-router.html) -like, in fact the routing implementation is a modified version of connect.router route matching function.
 

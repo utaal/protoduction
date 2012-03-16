@@ -2,3 +2,4 @@
 /withparams/:num   test/fixtures/withparams.jade        test/fixtures/data.json          $.withparams
 /dataless/:num     test/fixtures/withparams.jade
 /:page             test/fixtures/template.jade          test/fixtures/data.json          $.#page             one
+/pathparam/:pathparam test/fixtures/template.jade       test/fixtures/#pathparam.json    $

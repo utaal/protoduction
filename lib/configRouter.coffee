@@ -168,11 +168,11 @@ module.exports = (config_path, cb) ->
       params[key] = val
 
     jpath = mapPathParams route.jpath, params
-    # data_file = mapPathParams route.data_file, params
+    data_file = mapPathParams route.data_file, params
     
     found =
       template: route.template
-      data_file: route.data_file
+      data_file: data_file
       jpath: jpath
       keys: keys
       params: params
