@@ -126,7 +126,8 @@ module.exports = (config_path, cb) ->
         data = context
         log.DEBUG 'loaded data: ' + util.inspect data
         if jpath == '$'
-          data = [data]
+          if not (data instanceof Array)
+            data = [data]
         else
           data = jsonpath(data, jpath)
         log.DEBUG 'matched data: ' + util.inspect data
