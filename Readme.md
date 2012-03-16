@@ -45,6 +45,10 @@ later in this readme
 
 The JSONPath expressions and backing data file paths may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before reading the data file and evaluating the JSONPath expression against it.
 
+Jade templates get passed the matched object from backing data with two fileds added:
+  - `context` contain the entire contents of the data file
+  - `params` contain the values of the route parameters in the current request
+
 Routes are [sinatra](http://www.sinatrarb.com/intro#Routes) -like, or similarly, [connect.router](http://senchalabs.github.com/connect/middleware-router.html) -like, in fact the routing implementation is a modified version of connect.router route matching function.
 
 By default, two subdirs of the root protoduction site directories are treated
