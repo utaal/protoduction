@@ -27,8 +27,9 @@ at least, a single config file, named `config` at its root.
 
 `config` is a list of routes, each one with 2 to 5 parameters, separated by newlines, e.g.
 
-    /           index.jade        data.json        $.index
-    /posts/:id  blog_post.jade    data.json        $.posts['#id']      one
+    /               index.jade           data.json      $.index
+    /posts/:id      blog_post.jade       data.json      $.posts['#id']      one
+    /pages/:pageid  pages/#pageid.jade   data.json      $.pages['#pageid']  one
 
 where the parameters represent, respectively (in parentheses the corresponding actual argument for the second route in the example `config`) 
 
@@ -103,5 +104,6 @@ Testing is done through the excellent and extra-fun [mocha](http://visionmedia.g
 ### TODO
 
 - browser cache-control / if-modified-since / 304
+- configuration DSL in CoffeeScript
 
 #### Author: [Andrea Lattuada](http://backyardscale.com)
