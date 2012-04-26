@@ -28,6 +28,7 @@ render = (template_path, locals, cb) ->
   ###
   Render a jade template with the provided locals.
   ###
+  locals.f = jade.filters
   compile template_path, (err, fn) ->
     if (err)
       cb err

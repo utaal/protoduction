@@ -8,7 +8,7 @@ Enter **protoduction**,
 a simple, configurable server for template-based static websites
 built on [node](http://nodejs.org) as a [Connect](http://github.com/senchalabs/connect) middleware.
 
-- It lets you keep your *backing data* in json files, completely separate from presentation,
+- It lets you keep your *backing data* in [YAML](http://yaml.org/) files, completely separate from presentation,
 - filter it based on request path, through [JSONPath](http://goessner.net/articles/JsonPath/)
 - and present it in beautifully logic-less [jade](http://jade-lang.com/) templates.
 
@@ -23,28 +23,27 @@ Make sure you have [node](http://nodejs.org) 0.6.x installed, then run
 ## A protoduction site
 
 A protoduction site is, by default, represented by a directory containing,
-at least, a single config file, named `config` at its root.
+at least, a single config file, named `config` at its root and a data file named `data.yml`.
 
-`config` is a list of routes, each one with 2 to 5 parameters, separated by newlines, e.g.
+`config` is a list of routes, each one with 2 to 4 parameters, separated by newlines, e.g.
 
-    /               index.jade           data.json      $.index
-    /posts/:id      blog_post.jade       data.json      $.posts['#id']      one
-    /pages/:pageid  pages/#pageid.jade   data.json      $.pages['#pageid']  one
+    /               index.jade           $.index
+    /posts/:id      blog_post.jade       $.posts['#id']      one
+    /pages/:pageid  pages/#pageid.jade   $.pages['#pageid']  one
 
 where the parameters represent, respectively (in parentheses the corresponding actual argument for the second route in the example `config`) 
 
 - (`/posts/:id`) is the route to be matched, may contain route parameters (as `:id`), more complex matching is possible as explained
 later in this readme
 - (`index.jade`) is the template to be rendered in response
-- (`data.json`) is the (optional) backing data file path
-- (`$.index`) is a JSONPath query on the root json object of the json backing data file; it's only required and allowed if the backing data file path is present: the matched object(s) will be passed as view data (argument) to the jade template
+- (`$.index`) is a JSONPath query on the root object of the backing data file: the matched object(s) will be passed as view data (argument) to the jade template
 - an optional last argument (only allowed when data path specified) may be one of:
   - `one`: proceed rendering only if one and only one match is returned from the JSONPath query, pass that object as the view data
   - `any`: proceed rendering anyway, pass an array containing the matches (possibly none or multiple)
   - `many`: same as `any`, but proceed rendering only if at least one object is returned
   - if no option is specified: proceed rendering anyway, pass only the first match (or `null` if not present) as view data
 
-The JSONPath expressions, template and backing data file paths may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before reading the data file and evaluating the JSONPath expression against it.
+The JSONPath expressions and template paths may contain `#` (hashes) followed by the name of a route parameter (e.g. `$.posts['#id'] where `id` refers to `:id` in `/posts/:id`): they will be substitued with their actual value in the current request path before the evaluation of the JSONPath expression against it.
 
 Jade templates get passed the matched object from backing data with two fileds added:
   - `context` contain the entire contents of the data file
@@ -68,7 +67,7 @@ specially:
 
 While devloping, just run `protoduction` (installed in your $PATH by npm -g) at the root directory of the protoduction site,
 options available as listed by `protoduction --help`.
-`config` is automatically watched for changes and all jade/less templates, data files and static resources are
+`config` and `data.yml` are automatically watched for changes and all jade/less templates and static resources are
 checked/rerendered/reloaded on every request (currently only static files are cached on the server and set as cachable by
 the browser (through the `connect.static` and `connect.staticCache` middlewares), proper support for `if-modified-since`,
 `304 not-modified` and `etag` is a low hanging fruit and first on my list of upcoming improvements).

@@ -1,3 +1,4 @@
-/                 index.jade               data.json           $.homepage
-/page/:pageid     pages/#pageid.jade       data.json           $.pages['#pageid']         one         context:main.json
+/                       index.jade                   $
+/page/markdown-enabled  pages/markdown-enabled.jade  $.pages['markdown-enabled']  one
+/page/:pageid           pages/#pageid.jade           $.pages['#pageid']           one
 

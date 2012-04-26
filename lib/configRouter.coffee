@@ -39,7 +39,7 @@ normalizePath = (path, keys) ->
   new RegExp("^" + path + "$", "i")
 
 
-module.exports = (config_path, cb) ->
+module.exports = (config_path, data_path, cb) ->
   ###
   Exported higher order function which, provided with a config file path,
   returns a connect middleware.
@@ -49,8 +49,11 @@ module.exports = (config_path, cb) ->
   
   if not config_path?
     throw new Error('Missing configuration file path (config_path)')
+  if not data_path?
+    throw new Error('Missing data file path (data_path)')
 
   routes = []
+  data = {}
 
   # Route conditions allow conditional route processing based on the
   # number of object matched by the JSONPath query
@@ -60,11 +63,16 @@ module.exports = (config_path, cb) ->
 
 
   init = (cb) ->
-    updateRoutes(cb)
+    updateRoutes () ->
+      updateData () ->
+        cb() if cb?
 
     fs.watchFile config_path, (curr, prev) ->
       if curr.mtime.getTime() != prev.mtime.getTime()
         updateRoutes()
+    fs.watchFile data_path, (curr, prev) ->
+      if curr.mtime.getTime() != prev.mtime.getTime()
+        updateData()
 
 
   parseConfigLine = (line) ->
@@ -75,24 +83,22 @@ module.exports = (config_path, cb) ->
     split = _.reject line.split(/\s/), (val) -> val == ""
     if split.length < 2
       return
-    [path, template, data, jpath, cond] = split
+    [path, template, jpath, cond] = split
     keys = []
     path = normalizePath path, keys
     route =
       path: path
       keys: keys
       template: template
-    if data? and jpath?
+    if jpath?
       switch cond
         when "one" then cond = ROUTE_COND_ONE
         when "multi" then cond = ROUTE_COND_MULTI
         when "all" then cond = ROUTE_COND_ALL
         else cond = null
-      route.data_file = data
       route.jpath = jpath
       route.cond = cond
     route
-
 
   updateRoutes = (cb) ->
     ###
@@ -100,41 +106,52 @@ module.exports = (config_path, cb) ->
     ###
  
     log.DEBUG "config_path: #{config_path}"
-    data = fs.readFile config_path, 'utf8', (err, data) ->
+    fs.readFile config_path, 'utf8', (err, routedata) ->
       log.FATAL err if err
-      lines = data.split("\n")
+      lines = routedata.split("\n")
       parsed = _.map lines, (line) -> parseConfigLine line
       new_routes = _.filter parsed, (route) -> route?
       log.DEBUG "loaded new routes\n" + util.inspect new_routes
       routes = new_routes
       cb() if cb?
 
-  
-  getData = (data_file, jpath, cb) ->
+
+
+  updateData = (cb) ->
     ###
-    Retrieves data for a given data file and matches it with the provided
-    jsonpath.
+    (Re)loads data from data_path.
+    ###
+    
+    fs.readFile data_path, 'utf8', (err, datafile) ->
+      log.FATAL err if err
+      log.DEBUG 'loading data file'
+      try
+        yaml = require('js-yaml')
+        data = yaml.load(datafile)
+        log.DEBUG 'loaded data: ' + util.inspect data
+        cb() if cb?
+      catch except
+        log.FATAL 'cannot parse data file: ' + except
+  
+  getData = (jpath, cb) ->
+    ###
+    Retrieves data matching a given jsonpath.
     Callbacks when complete with the matched object(s) and the entire data file
     contents as context.
     ###
 
-    fs.readFile data_file, 'utf8', (err, data) ->
-      if err
-        cb httpError(404, err.message)
-        return
-      try
-        context = JSON.parse(data)
-        data = context
-        log.DEBUG 'loaded data: ' + util.inspect data
-        if jpath == '$'
-          if not (data instanceof Array)
-            data = [data]
-        else
-          data = jsonpath(data, jpath)
-        log.DEBUG 'matched data: ' + util.inspect data
-        cb null, data, context
-      catch except
-        cb httpError(500, except.message)
+    try
+      context = data
+      matched = context
+      if jpath == '$'
+        if not (matched instanceof Array)
+          matched = [matched]
+      else
+        matched = jsonpath(matched, jpath)
+      log.DEBUG 'matched data: ' + util.inspect matched
+      cb null, matched, context
+    catch except
+      cb httpError(500, except.message)
 
 
   mapPathParams = (path, params) ->
@@ -170,12 +187,10 @@ module.exports = (config_path, cb) ->
       params[key] = val
 
     jpath = mapPathParams route.jpath, params
-    data_file = mapPathParams route.data_file, params
     template = mapPathParams route.template, params
     
     found =
       template: template
-      data_file: data_file
       jpath: jpath
       keys: keys
       params: params
@@ -231,10 +246,10 @@ module.exports = (config_path, cb) ->
       log.DEBUG "url #{parsedUrl.pathname} not matched"
       next()
       return
-    if not matched.data_file?
-      send matched, {}, null, req, res, next
+    if not matched.jpath?
+      send matched, {}, data, req, res, next
     else
-      getData matched.data_file, matched.jpath, (err, obj, context) ->
+      getData matched.jpath, (err, obj, context) ->
         if err
           next httpError 500, err.message
           return

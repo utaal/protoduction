@@ -1,9 +1,10 @@
 !!!
 html
   head
-    title=title
-    link(rel="stylesheet", href="/bootstrap.css")
-    link(rel="stylesheet", href="/style/main.css")
+    block head
+      title Protoduction - #{title}
+      link(rel="stylesheet", href="/bootstrap.css")
+      link(rel="stylesheet", href="/style/main.css")
   body
     .navbar.navbar-fixed-top
       .navbar-inner

@@ -1,0 +1,50 @@
+extends ../page
+
+block page
+  p Don't feel like writing all your content in jade?
+  :markdown
+    Use some **markdown**, in templates.
+  != f.markdown(content)
+
+  section#source
+    .page-header
+      h1 Source
+    .row
+      .span12
+        h2 config
+        p
+          span.label just the part relevant to this page
+        pre
+          | /page/:pageid     pages/#pageid.jade       data.json           $.pages['#pageid']         one
+      .span6
+        h2 pages/firts-page.jade
+        pre
+          | extends ../page
+          | 
+          | block page
+          |   p Don't feel like writing all your content in jade?
+          |   :markdown
+          |     Use some **markdown**, in templates.
+          |   != f.markdown(content)
+        span.label snip
+      .span6
+        h2 page.jade
+        pre
+          | extends layout
+          | 
+          | block content
+          |   section#page
+          |     .page-header
+          |       h1 #{title}
+          |     block page
+      .span12
+        h2 data.yml
+        pre
+          | pages:
+          |   markdown-enabled: 
+          |     title: Markdown! Sweet!
+          |     brief: >
+          |       You can use every jade feature you love, markdown filters included.
+          |       Keep content and presentation separated, if you're so inclined.
+          |     content: >
+          |       Or put content in data files and use jade filters to render it. Use `f.markdown`, `f.stylus`, etc.

@@ -13,6 +13,7 @@ optimist = require('optimist')
   .default('port', 8000)
   .default('debug', false)
   .default('config-path', 'config')
+  .default('data-path', 'data.yml')
   .boolean('help')
   .default('minify-css', true) # TODO: use NODE_ENV instead
   .default('public-path', 'public')
@@ -36,7 +37,7 @@ server.use connect.static(argv['public-path'])
 server.use '/' + argv['stylesheet-path'], lessCompiler(
   argv['stylesheet-path'],
   {compress: argv['minify-css']})
-server.use configRouter(argv['config-path'])
+server.use configRouter(argv['config-path'], argv['data-path'])
 
 server.listen(argv.port)
 log.INFO "serving on port #{argv.port}"
