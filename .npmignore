@@ -1,4 +1,5 @@
 *.md
+*.swp
 .git*
 test/
 example/

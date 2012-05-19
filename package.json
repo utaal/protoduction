@@ -1,6 +1,6 @@
 {
   "name": "protoduction"
-, "version": "0.0.2"
+, "version": "0.0.3"
 , "description": "lightweight server for template-based static websites"
 , "keywords": [ "server", "static", "cms" ]
 , "author": "Andrea Lattuada <andrea@backyardscale.com>"
