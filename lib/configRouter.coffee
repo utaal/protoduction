@@ -52,8 +52,8 @@ module.exports = (config_path, data_path, cb) ->
   if not data_path?
     throw new Error('Missing data file path (data_path)')
 
-  routes = []
-  data = {}
+  routes_ = []
+  data_ = {}
 
   # Route conditions allow conditional route processing based on the
   # number of object matched by the JSONPath query
@@ -63,16 +63,9 @@ module.exports = (config_path, data_path, cb) ->
 
 
   init = (cb) ->
-    updateRoutes () ->
-      updateData () ->
+    loadRoutes () ->
+      loadData () ->
         cb() if cb?
-
-    fs.watchFile config_path, (curr, prev) ->
-      if curr.mtime.getTime() != prev.mtime.getTime()
-        updateRoutes()
-    fs.watchFile data_path, (curr, prev) ->
-      if curr.mtime.getTime() != prev.mtime.getTime()
-        updateData()
 
 
   parseConfigLine = (line) ->
@@ -100,7 +93,8 @@ module.exports = (config_path, data_path, cb) ->
       route.cond = cond
     route
 
-  updateRoutes = (cb) ->
+
+  loadRoutes = (cb) ->
     ###
     (Re)loads the routing configuration from config_path.
     ###
@@ -111,28 +105,31 @@ module.exports = (config_path, data_path, cb) ->
       lines = routedata.split("\n")
       parsed = _.map lines, (line) -> parseConfigLine line
       new_routes = _.filter parsed, (route) -> route?
-      log.DEBUG "loaded new routes\n" + util.inspect new_routes
-      routes = new_routes
+      log.DEBUG "loaded routes\n" + util.inspect new_routes
+      routes_ = new_routes
       cb() if cb?
 
 
-
-  updateData = (cb) ->
+  loadData = (cb) ->
     ###
     (Re)loads data from data_path.
     ###
-    
-    fs.readFile data_path, 'utf8', (err, datafile) ->
-      log.FATAL err if err
-      log.DEBUG 'loading data file'
-      try
-        yaml = require('js-yaml')
-        data = yaml.load(datafile)
-        log.DEBUG 'loaded data: ' + util.inspect data
-        cb() if cb?
-      catch except
-        log.FATAL 'cannot parse data file: ' + except
+    try
+      datafile = fs.readFileSync data_path, 'utf8'
+      yaml = require('js-yaml')
+      yaml.addConstructor '!include', (node, loader) ->
+        log.DEBUG util.inspect(node)
+        path = node.value
+        log.DEBUG "including yaml file #{path}"
+        yaml_data = fs.readFileSync path, 'utf8'
+        return yaml.load(yaml_data)
+      data_ = yaml.load(datafile)
+      log.DEBUG 'loaded data: ' + util.inspect data_
+      cb() if cb?
+    catch except
+      log.FATAL 'cannot load data file: ' + except
   
+
   getData = (jpath, cb) ->
     ###
     Retrieves data matching a given jsonpath.
@@ -141,7 +138,7 @@ module.exports = (config_path, data_path, cb) ->
     ###
 
     try
-      context = data
+      context = data_
       matched = context
       if jpath == '$'
         if not (matched instanceof Array)
@@ -207,8 +204,8 @@ module.exports = (config_path, data_path, cb) ->
 
     found = undefined
     i = 0
-    while i < routes.length and not found?
-      route = routes[i]
+    while i < routes_.length and not found?
+      route = routes_[i]
       found = tryRoute route, path
       ++i
     return found
@@ -247,7 +244,7 @@ module.exports = (config_path, data_path, cb) ->
       next()
       return
     if not matched.jpath?
-      send matched, {}, data, req, res, next
+      send matched, {}, data_, req, res, next
     else
       getData matched.jpath, (err, obj, context) ->
         if err

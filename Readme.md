@@ -23,7 +23,7 @@ Make sure you have [node](http://nodejs.org) 0.6.x installed, then run
 ## A protoduction site
 
 A protoduction site is, by default, represented by a directory containing,
-at least, a single config file, named `config` at its root and a data file named `data.yml`.
+at least, a single config file named `config` and a root data file named `data.yml`.
 
 `config` is a list of routes, each one with 2 to 4 parameters, separated by newlines, e.g.
 
@@ -50,6 +50,10 @@ Jade templates get passed the matched object from backing data with two fileds a
   - `params` contain the values of the route parameters in the current request
 
 Routes are [sinatra](http://www.sinatrarb.com/intro#Routes) -like, or similarly, [connect.router](http://senchalabs.github.com/connect/middleware-router.html) -like, in fact the routing implementation is a modified version of connect.router route matching function.
+
+The yaml parser is equipped with a custom type constructor, `!include`, that allows the inclusion of other yaml files in place of elements: you can say `!include other_data_file.yml` and it will be replaced with the other_data_file contents at the same indentation level.
+
+An example site showcasing most of the available features can be found in `example/`.
 
 By default, two subdirs of the root protoduction site directories are treated
 specially:
@@ -105,4 +109,4 @@ Testing is done through the excellent and extra-fun [mocha](http://visionmedia.g
 - browser cache-control / if-modified-since / 304
 - configuration DSL in CoffeeScript
 
-#### Author: [Andrea Lattuada](http://backyardscale.com)
+#### Author: [Andrea Lattuada](http://utaal.github.com)

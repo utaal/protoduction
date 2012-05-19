@@ -1,0 +1,20 @@
+extends ../page
+
+block page
+  div
+    != f.markdown(content)
+  section#source
+    .page-header
+      h1 Source
+    .row
+      each file in source
+        div(class='span' + file.size)
+          h2= file.name
+          if file.name == "config"
+            p
+             span.label just the part relevant to this page
+          each snippet, i in file.code
+            if i !== 0
+              span.label snip
+            pre
+              != snippet
