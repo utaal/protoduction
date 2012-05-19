@@ -1,0 +1,87 @@
+extends layout
+
+block prepend head
+  - title = "Home"
+
+block content
+  .hero-unit
+    h1 How to serve in protoduction
+    p This is an example site powered by protoduction in which 
+      | every page contains its own source, routing info and 
+      | template locals.
+    p It serves as a guidance to quickly create your semi-static site.
+    p More info regarding protoduction may be found on 
+      a(href='http://github.com/utaal/protoduction', target="_blank") github.
+
+  section#cms
+    .page-header
+      h1 CMS-alike
+    ul.thumbnails
+      each page, key in pages
+        li.span4
+          .thumbnail
+            .page-brief
+              a(href="/page/" + key)
+                h3 #{page.title}
+              p #{page.brief}
+
+  section#source
+    .page-header
+      h1 Source
+    .row
+      .span12
+        h2 config
+        p
+          span.label just the part relevant to this page
+        pre
+          | /                 index.jade            data.json           $.homepage
+      .span6
+        h2 layout.jade
+        pre
+          | !!!
+          | html
+          |   head
+          |     title Protoduction - #{title}
+          |     link(rel="stylesheet", href="/bootstrap.css")
+          |     link(rel="stylesheet", href="/style/main.css")
+          |   body
+          |     .navbar.navbar-fixed-top
+          |       .navbar-inner
+          |         .container
+          |           a.brand(href="#") Protoduction
+          |     .container
+          |       block content
+          |     include include/forkongithub.html
+
+      .span6
+        h2 index.jade
+        pre
+          | block content
+          |   .hero-unit
+          |     h1 How to serve in protoduction
+        span.label snip
+        pre
+          |   section#cms
+          |     .page-header
+          |       h1 CMS-alike
+          |     ul.thumbnails
+          |       each page, key in pages
+          |         li.span4
+          |           .thumbnail
+          |             .page-brief
+          |               a(href="/page/" + key)
+          |                 h3 \#{page.title}
+          |               p \#{page.brief}
+      .span12
+        h2 data.yml
+        pre
+          | pages:
+          |   markdown-enabled: 
+          |     title: Markdown! Sweet!
+          |     brief: >
+          |       You can use every jade feature you love, markdown filters included.
+          |       Keep content and presentation separated, if you're so inclined.
+        span.label snip
+        pre
+          |   second-page:
+          |     !include second_page.yml
