@@ -1,0 +1,71 @@
+title: Yaml !include
+brief: Protoduction introduces a custom yaml type constructor that allows importing of secondary data files in a data tree.
+content: >
+  Protoduction introduces a custom yaml type constructor, `!include <filename>`, that allows importing of secondary data files in a data tree.
+source:
+  -
+    name: "config"
+    size: 12
+    code:
+      - /page/:pageid           pages/page_with_source.jade  $.pages['#pageid']           one
+
+  -
+    name: "pages/page_with_source.jade"
+    size: 6
+    code:
+      - >
+        extends ../page
+
+        block page
+          div
+            != f.markdown(content)
+          section#source
+            .page-header
+              h1 Source
+            .row
+              each file in source
+                div(class='span' + file.size)
+                  h2= file.name
+                  if file.name == "config"
+                    p
+                     span.label just the part relevant to this page
+                  each snippet, i in file.code
+                    if i !== 0
+                      span.label snip
+                    pre
+                      != snippet
+  -
+    name: "second_page.yml"
+    size: 6
+    code:
+      - >
+        title: Yaml !include
+      - >
+        source:
+          -
+            name: "config"
+            size: 12
+            code:
+      - >
+        &nbsp;
+          -
+            name: "pages/page_with_source.jade"
+            size: 6
+            code:
+              - >
+                extends ../page
+
+                block page
+                  div
+                    != f.markdown(content)
+                  section#source
+  -
+    name: "data.yml"
+    size: 6
+    code:
+      - >
+        pages:
+      - >
+        &nbsp;
+          second-page:
+            !include second_page.yml

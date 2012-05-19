@@ -28,7 +28,7 @@ if argv.debug
   logmodule.enableDebug()
 
 log = logmodule.logger('protoduction')
-log.DEBUG __dirname
+log.DEBUG "__dirname: #{__dirname}"
 
 server = connect.createServer()
 server.use connect.logger('tiny')
