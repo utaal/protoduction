@@ -53,7 +53,6 @@ module.exports = (config_path, data_path, cb) ->
     throw new Error('Missing data file path (data_path)')
 
   routes_ = []
-  data_ = {}
 
   # Route conditions allow conditional route processing based on the
   # number of object matched by the JSONPath query
@@ -64,8 +63,7 @@ module.exports = (config_path, data_path, cb) ->
 
   init = (cb) ->
     loadRoutes () ->
-      loadData () ->
-        cb() if cb?
+      cb() if cb?
 
 
   parseConfigLine = (line) ->
@@ -112,7 +110,7 @@ module.exports = (config_path, data_path, cb) ->
 
   loadData = (cb) ->
     ###
-    (Re)loads data from data_path.
+    Loads data from data_path.
     ###
     try
       datafile = fs.readFileSync data_path, 'utf8'
@@ -123,22 +121,22 @@ module.exports = (config_path, data_path, cb) ->
         log.DEBUG "including yaml file #{path}"
         yaml_data = fs.readFileSync path, 'utf8'
         return yaml.load(yaml_data)
-      data_ = yaml.load(datafile)
-      log.DEBUG 'loaded data: ' + util.inspect data_
-      cb() if cb?
+      data = yaml.load(datafile)
+      log.DEBUG 'loaded data: ' + util.inspect data
+      cb null, data
     catch except
-      log.FATAL 'cannot load data file: ' + except
+      log.ERROR 'cannot load data file: ' + except
+      cb except
   
 
-  getData = (jpath, cb) ->
+  getData = (data, jpath, cb) ->
     ###
     Retrieves data matching a given jsonpath.
     Callbacks when complete with the matched object(s) and the entire data file
     contents as context.
     ###
-
     try
-      context = data_
+      context = data
       matched = context
       if jpath == '$'
         if not (matched instanceof Array)
@@ -243,28 +241,31 @@ module.exports = (config_path, data_path, cb) ->
       log.DEBUG "url #{parsedUrl.pathname} not matched"
       next()
       return
-    if not matched.jpath?
-      send matched, {}, data_, req, res, next
-    else
-      getData matched.jpath, (err, obj, context) ->
-        if err
-          next httpError 500, err.message
-          return
-        switch matched.cond
-          when ROUTE_COND_ONE
-            if obj.length != 1
-              log.DEBUG "route condition 'one' not satisfied"
-              next()
-              return
-            obj = obj[0]
-          when ROUTE_COND_MULTI
-            if obj.length < 1
-              log.DEBUG "route condition 'multi' not satisfied"
-              next()
-          when ROUTE_COND_ALL
-          else
-            obj = obj[0]
-        send matched, obj, context, req, res, next
+    loadData (err, data) ->
+      if err?
+        next httpError 500, err.message
+      if not matched.jpath?
+        send matched, {}, data, req, res, next
+      else
+        getData data, matched.jpath, (err, obj, context) ->
+          if err?
+            next httpError 500, err.message
+            return
+          switch matched.cond
+            when ROUTE_COND_ONE
+              if obj.length != 1
+                log.DEBUG "route condition 'one' not satisfied"
+                next()
+                return
+              obj = obj[0]
+            when ROUTE_COND_MULTI
+              if obj.length < 1
+                log.DEBUG "route condition 'multi' not satisfied"
+                next()
+            when ROUTE_COND_ALL
+            else
+              obj = obj[0]
+          send matched, obj, context, req, res, next
 
   init(cb)
   return processRequest
