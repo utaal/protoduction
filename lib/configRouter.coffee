@@ -121,6 +121,11 @@ module.exports = (config_path, data_path, cb) ->
         log.DEBUG "including yaml file #{path}"
         yaml_data = fs.readFileSync path, 'utf8'
         return yaml.load(yaml_data)
+      yaml.addConstructor '!put', (node, loader) ->
+        path = node.value
+        log.DEBUG "including raw file #{path}"
+        raw_data = fs.readFileSync path, 'utf8'
+        return raw_data
       data = yaml.load(datafile)
       log.DEBUG 'loaded data: ' + util.inspect data
       cb null, data
