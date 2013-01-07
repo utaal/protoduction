@@ -7,7 +7,7 @@ logger = (module) ->
       "\n        "
     else
       ""
-  public =
+  ret =
     INFO: (message) ->
       console.info prefix() + "INFO  [#{module}] " + message
     ERROR: (message) ->

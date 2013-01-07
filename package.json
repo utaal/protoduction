@@ -1,6 +1,6 @@
 {
   "name": "protoduction"
-, "version": "0.0.4"
+, "version": "0.1.0"
 , "description": "lightweight server for template-based static websites"
 , "keywords": [ "server", "static", "cms" ]
 , "author": "Andrea Lattuada <andrea@backyardscale.com>"
@@ -9,25 +9,19 @@
 , "main": "index"
 , "bin": { "protoduction": "./bin/protoduction" }
 , "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter list test/lib/*.coffee"
-  , "example-site": "cd example; ../bin/protoduction"
+    "example-site": "cd example; ../bin/protoduction"
   }
 , "dependencies":
-    { "coffee-script": "~1.2.0"
-    , "connect": "*"
-    , "fresh": "*"
-    , "jade": "~0.21.0"
-    , "JSONPath": "~0.8.5"
-    , "less": "~1.3.0"
-    , "optimist": "~0.3.1"
-    , "marked": "*"
-    , "send": "*"
-    , "underscore": "~1.3.1"
-    , "js-yaml": "~0.3.7"
-    }
-, "devDependencies":
-    { "mocha": "*"
-    , "should": "~0.6.0"
+    { "coffee-script": "~1.4.0"
+    , "connect": "~2.7.2"
+    , "jade": "~0.27.7"
+    , "JSONPath": "*"
+    , "js-yaml": "~1.0.3"
+    , "less": "~1.3.3"
+    , "optimist": "~0.3.5"
+    , "marked": "~0.2.7"
+    , "send": "~0.1.0"
+    , "underscore": "~1.4.3"
     }
 , "engines":
     { "node": "~0.8.16" }
