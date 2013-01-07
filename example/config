@@ -1,4 +1,3 @@
 /                       index.jade                   $
 /page/markdown-enabled  pages/markdown-enabled.jade  $.pages['markdown-enabled']  one
-/page/third-page        page.jade                    $.pages['third-page']        one
 /page/:pageid           pages/page_with_source.jade  $.pages['#pageid']           one

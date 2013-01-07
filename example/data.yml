@@ -7,9 +7,6 @@ pages:
       Keep content and presentation separated, if you're so inclined.
     content: >
       Or put content in data files and use jade filters to render it. Use `f.markdown`, `f.stylus`, etc.
-  second-page:
-    !include second_page.yml
-  third-page: 
-    title: Third page
-    brief: Nunc purus felis, sagittis commodo pharetra feugiat, lobortis quis turpis. Fusce id velit in diam gravida pellentesque sit amet at dolor.
-    content: Sample **content**.
+  yaml-include-page:
+    !include yaml_include_page.yml
+

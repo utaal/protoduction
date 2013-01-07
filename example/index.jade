@@ -5,11 +5,11 @@ block prepend head
 
 block content
   .hero-unit
-    h1 How to serve in protoduction
-    p This is an example site powered by protoduction in which 
-      | every page contains its own source, routing info and 
-      | template locals.
-    p It serves as a guidance to quickly create your semi-static site.
+    h2 A protoduction example
+    p This is an example site powered by protoduction, a semi-static site generator
+      |  server built upon jade, less, connect and yaml.
+    p Every page lists its own source, routing info and template locals so it serves
+      |  as a guidance to quickly create your own site.
     p More info regarding protoduction may be found on 
       a(href='http://github.com/utaal/protoduction', target="_blank") github.
 
@@ -51,7 +51,6 @@ block content
           |           a.brand(href="#") Protoduction
           |     .container
           |       block content
-          |     include include/forkongithub.html
 
       .span6
         h2 index.jade
@@ -84,4 +83,4 @@ block content
         span.label snip
         pre
           |   second-page:
-          |     !include second_page.yml
+          |     !include yaml_include_page.yml
