@@ -4,19 +4,26 @@
 Compiles and serves less files.
 ###
 
+connect = require('connect')
 fs = require('fs')
 less = require('less')
 log = require('./log').logger('lessCompiler')
 { httpError } = require('./httpUtil')(log)
+responseCache = require('./responseCache')
 url = require('url')
+util = require('util')
 
 module.exports = (search_path, opts) ->
   opts = opts || {}
   compress = opts.compress || false
 
+  log.DEBUG "cache size: " + opts.cache_size
+  cache = responseCache(opts.cache_size)
+
   ret = (req, res, next) ->
     parsedUrl = url.parse(req.url)
     path = parsedUrl.pathname
+
     if path.substring(path.length - 4) != '.css'
       log.DEBUG "skipping #{path}, it doesn't end with .css"
       next()
@@ -27,6 +34,9 @@ module.exports = (search_path, opts) ->
       return
 
     filename = search_path + path.substring(0, path.length - 4) + ".less"
+    if cache.maybeHandleRequest filename, req, res
+      return
+
     log.DEBUG "using template #{filename}"
     fs.readFile filename, 'utf8', (err, data) ->
       if err
@@ -43,6 +53,8 @@ module.exports = (search_path, opts) ->
         catch except
           next httpError 500, "#{filename}: cannot render less: #{except.message}"
           return
-        res.writeHead 200, 'Content-Type': 'text/css'
-        res.end rendered
+
+        headers =
+          'Content-Type': 'text/css',
+        cache.addAndSend filename, headers, rendered, res
 

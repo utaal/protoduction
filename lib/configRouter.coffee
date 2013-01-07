@@ -11,6 +11,7 @@ jsonpath = require('JSONPath').eval
 log = require('./log').logger('configRouter')
 { httpError } = require('./httpUtil')(log)
 renderer = require('./renderer')
+responseCache = require('./responseCache')
 url = require('url')
 util = require('util')
 _ = require('underscore')
@@ -39,7 +40,7 @@ normalizePath = (path, keys) ->
   new RegExp("^" + path + "$", "i")
 
 
-module.exports = (config_path, data_path, cb) ->
+module.exports = (config_path, data_path, opts, cb) ->
   ###
   Exported higher order function which, provided with a config file path,
   returns a connect middleware.
@@ -47,12 +48,15 @@ module.exports = (config_path, data_path, cb) ->
   complete.
   ###
   
+  opts = opts || {}
+  
   if not config_path?
     throw new Error('Missing configuration file path (config_path)')
   if not data_path?
     throw new Error('Missing data file path (data_path)')
 
   routes_ = []
+  cache = responseCache(opts.cache_size)
 
   # Route conditions allow conditional route processing based on the
   # number of object matched by the JSONPath query
@@ -214,7 +218,7 @@ module.exports = (config_path, data_path, cb) ->
     return found
 
 
-  send = (matched, obj, context, req, res, next) ->
+  send = (matched, pathname, obj, context, req, res, next) ->
     ###
     Renders and sends response.
     ###
@@ -227,8 +231,9 @@ module.exports = (config_path, data_path, cb) ->
       if err
         next httpError 500, err.message
         return
-      res.writeHead 200, 'Content-Type': 'text/html'
-      res.end html
+      headers =
+        'Content-Type': 'text/html'
+      cache.addAndSend pathname, headers, html, res
 
 
   processRequest = (req, res, next) ->
@@ -240,17 +245,21 @@ module.exports = (config_path, data_path, cb) ->
     if not get
       next()
       return
-    parsedUrl = url.parse req.url
-    matched = match parsedUrl.pathname
+    pathname = url.parse(req.url).pathname
+    # if pathname.endsWith('/')
+    #   pathname = pathname.slice(0, -1)
+    matched = match pathname
+    if cache.maybeHandleRequest pathname, req, res
+      return
     if not matched?
-      log.DEBUG "url #{parsedUrl.pathname} not matched"
+      log.DEBUG "url #{pathname} not matched"
       next()
       return
     loadData (err, data) ->
       if err?
         next httpError 500, err.message
       if not matched.jpath?
-        send matched, {}, data, req, res, next
+        send matched, pathname, {}, data, req, res, next
       else
         getData data, matched.jpath, (err, obj, context) ->
           if err?
@@ -270,7 +279,7 @@ module.exports = (config_path, data_path, cb) ->
             when ROUTE_COND_ALL
             else
               obj = obj[0]
-          send matched, obj, context, req, res, next
+          send matched, pathname, obj, context, req, res, next
 
   init(cb)
   return processRequest

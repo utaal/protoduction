@@ -49,7 +49,7 @@ Jade templates get passed the matched object from backing data with two fileds a
   - `context` contain the entire contents of the data file
   - `params` contain the values of the route parameters in the current request
 
-Routes are [sinatra](http://www.sinatrarb.com/intro#Routes) -like, or similarly, [connect.router](http://senchalabs.github.com/connect/middleware-router.html) -like, in fact the routing implementation is a modified version of connect.router route matching function.
+Routes are [sinatra](http://www.sinatrarb.com/intro#Routes) -like, or similarly, [connect.router](http://senchalabs.github.com/connect/middleware-router.html) -like, in fact the routing implementation is a modified version of connect.router's route matching function.
 
 The yaml parser is equipped with a custom type constructor, `!include`, that allows the inclusion of other yaml files in place of elements: you can say `!include other_data_file.yml` and it will be replaced with the other_data_file contents at the same indentation level.
 
@@ -71,18 +71,18 @@ specially:
 
 While devloping, just run `protoduction` (installed in your $PATH by npm -g) at the root directory of the protoduction site,
 options available as listed by `protoduction --help`.
-`config` and `data.yml` are automatically watched for changes and all jade/less templates and static resources are
-checked/rerendered/reloaded on every request (currently only static files are cached on the server and set as cachable by
-the browser (through the `connect.static` and `connect.staticCache` middlewares), proper support for `if-modified-since`,
-`304 not-modified` and `etag` is a low hanging fruit and first on my list of upcoming improvements).
+All data files, jade/less templates and static resources are checked/rerendered/reloaded on every request so you can iterate
+quickly. A restart is only needed after a change to the `config` file so that protoduction can pick up the new routes.
 
 When **deploying**, install protoduction on the target machine, copy the site directory to the production machine and, at its root, run
 
     NODE_ENV='production' protoduction --port 8000 # or whatever port you like
 
+Starting with `NODE_ENV='production'` will disable developer-oriented error output in the browser and enable caching (LRU) of rendered css and jade. The number of most used items that will be kept in cache can be tweaked with `--less-cache-size` and `--page-cache-size`.
+
 It's recommended to run protoduction on a nonprivileged port behind a reverse proxy (as nginx, apahe with mod_proxy or node-proxy) running on port 80.
 
-Keep in mind that while pretty simple and at-least-partially tested, this is *really* young code, it may fail in the most unexpected ways. And I won't be held responsible for that, while I'll try my best to get it fixed for you (send a bug report!).
+Keep in mind that while pretty simple, this is *really* young code, it may fail in the most unexpected ways. And I won't be held responsible for that, while I'll try my best to get it fixed for you (send a bug report!).
 
 TIP: use git hooks for automated deployments, [monit](http://mmonit.com/monit/) or to keep it up even if it fails miserably, and [upstart](http://upstart.ubuntu.com/) or the like to make it restart automatically on reboot
 
@@ -106,7 +106,6 @@ Testing is done through the excellent and extra-fun [mocha](http://visionmedia.g
 
 ### TODO
 
-- browser cache-control / if-modified-since / 304
 - configuration DSL in CoffeeScript
 
 #### Author: [Andrea Lattuada](http://utaal.github.com)
