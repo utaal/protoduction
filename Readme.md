@@ -100,10 +100,6 @@ Contributions are welcome! as well as bug reports and feature requests.
 
 Use github issues/pullrequests, or send me an email: andrea [at] backyardscale [dot] com
 
-Testing is done through the excellent and extra-fun [mocha](http://visionmedia.github.com/mocha/), just run
-
-    npm test
-
 ### TODO
 
 - configuration DSL in CoffeeScript
