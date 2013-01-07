@@ -33,7 +33,7 @@ at least, a single config file named `config` and a root data file named `data.y
 
 where the parameters represent, respectively (in parentheses the corresponding actual argument for the second route in the example `config`) 
 
-- (`/posts/:id`) is the route to be matched, may contain route parameters (as `:id`), more complex matching is possible as explained
+- (`/posts/:id`) is the route to be matched, may contain route parameters (like `:id`); more complex matching is possible as explained
 later in this readme
 - (`index.jade`) is the template to be rendered in response
 - (`$.index`) is a JSONPath query on the root object of the backing data file: the matched object(s) will be passed as view data (argument) to the jade template
@@ -78,7 +78,7 @@ When **deploying**, install protoduction on the target machine, copy the site di
 
     NODE_ENV='production' protoduction --port 8000 # or whatever port you like
 
-Starting with `NODE_ENV='production'` will disable developer-oriented error output in the browser and enable caching (LRU) of rendered css and jade. The number of most used items that will be kept in cache can be tweaked with `--less-cache-size` and `--page-cache-size`.
+Starting with `NODE_ENV='production'` will disable developer-oriented error output in the browser and enable caching (LRU) of rendered css and jade. The number of most requested items that will be kept in cache can be tweaked with `--less-cache-size` and `--page-cache-size`. When server-side caching is enabled, protoduction will also honor if-modified-since conditional GETs and will return a 304 (Not Modified) status code for all requests whose target has been cached since the last server restart. For these reasons the server should be restarted after any change to the site definition in production.
 
 It's recommended to run protoduction on a nonprivileged port behind a reverse proxy (as nginx, apahe with mod_proxy or node-proxy) running on port 80.
 
